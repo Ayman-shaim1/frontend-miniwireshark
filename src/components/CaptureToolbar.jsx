@@ -1,3 +1,4 @@
+import { Play, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function CaptureToolbar({
@@ -53,6 +54,7 @@ export default function CaptureToolbar({
               onClick={onStart}
               disabled={loading || !selectedInterface || isCapturing}
             >
+              <Play className="size-4" />
               Démarrer
             </Button>
             <Button
@@ -61,6 +63,7 @@ export default function CaptureToolbar({
               onClick={onStop}
               disabled={loading || !isCapturing}
             >
+              <Square className="size-4" />
               Arrêter
             </Button>
           </div>

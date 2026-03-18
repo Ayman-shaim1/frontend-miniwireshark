@@ -5,6 +5,7 @@ import {
   useMemo,
   useDeferredValue,
 } from "react";
+import { LineChart, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CaptureToolbar from "@/components/CaptureToolbar";
 import LiveChartDrawer from "@/components/LiveChartDrawer";
@@ -189,6 +190,7 @@ export default function HomePage() {
                 variant="outline"
                 onClick={() => setChartDrawerOpen(true)}
               >
+                <LineChart className="size-4" />
                 Live line chart
               </Button>
               <Button
@@ -197,6 +199,7 @@ export default function HomePage() {
                 onClick={() => setPackets([])}
                 disabled={packets.length === 0}
               >
+                <Trash2 className="size-4" />
                 Effacer
               </Button>
             </div>
