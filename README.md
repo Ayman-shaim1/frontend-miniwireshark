@@ -1,16 +1,24 @@
-# React + Vite
+# react-miniwireshark
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A lightweight React UI for viewing and analyzing network packets — a mini Wireshark-like experience in the browser. Includes live capture views, dashboard analytics, and packet history.
 
-Currently, two official plugins are available:
+## Run with Docker
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**Build:**
+```bash
+docker build -t react-miniwireshark .
+```
 
-## React Compiler
+**Run (port 3000):**
+```bash
+docker run -p 3000:80 react-miniwireshark
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Open http://localhost:3000
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+*Note: This frontend expects a backend API (default `http://localhost:8080/api`) and WebSocket server (default `http://localhost:9092`). Use build args to override for production:*
+```bash
+docker build --build-arg VITE_API_URL=https://your-api.com/api --build-arg VITE_SOCKET_URL=https://your-api.com -t react-miniwireshark .
+```

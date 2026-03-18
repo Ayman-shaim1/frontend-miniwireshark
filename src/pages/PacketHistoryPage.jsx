@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Filter, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Filter, Trash2, ChevronLeft, ChevronRight, Download, ChevronDown } from "lucide-react";
 import historyService from "@/services/historyService";
 
 const PROTOCOLS = ["", "TCP", "UDP", "ICMP", "HTTP", "POSTGRESQL", "DNS", "ARP"];
@@ -30,7 +30,30 @@ export default function PacketHistoryPage() {
     length: "",
     info: "",
   });
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const exportRef = useRef(null);
   const pageSize = 100;
+
+  const handleExport = async (format) => {
+    setExportOpen(false);
+    setExporting(true);
+    setError(null);
+    try {
+      const blob = await historyService.exportHistory(format, appliedFilters);
+      const ext = format === "csv" ? "csv" : "json";
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `historique-paquets-${new Date().toISOString().slice(0, 10)}.${ext}`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const setColFilter = (col, value) => {
     setColFilters((prev) => ({ ...prev, [col]: value }));
@@ -143,6 +166,15 @@ export default function PacketHistoryPage() {
     fetchHistory();
   }, [fetchHistory]);
 
+  useEffect(() => {
+    if (!exportOpen) return;
+    const handleClickOutside = (e) => {
+      if (exportRef.current && !exportRef.current.contains(e.target)) setExportOpen(false);
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [exportOpen]);
+
   return (
     <div className="flex h-full flex-col p-4">
       <div className="flex min-h-0 flex-1 flex-col rounded-lg border bg-card">
@@ -183,6 +215,36 @@ export default function PacketHistoryPage() {
               <Trash2 className="size-3.5" />
               Effacer
             </button>
+            <div className="relative" ref={exportRef}>
+              <button
+                type="button"
+                onClick={() => setExportOpen((o) => !o)}
+                disabled={exporting}
+                className="flex h-7 items-center gap-1.5 rounded border border-input bg-background px-3 text-xs font-medium hover:bg-muted disabled:opacity-50"
+              >
+                <Download className="size-3.5" />
+                Exporter
+                <ChevronDown className="size-3.5" />
+              </button>
+              {exportOpen && (
+                <div className="absolute right-0 top-full z-20 mt-1 min-w-[100px] rounded border border-input bg-background py-1 shadow-md">
+                  <button
+                    type="button"
+                    onClick={() => handleExport("json")}
+                    className="w-full px-3 py-1.5 text-left text-xs hover:bg-muted"
+                  >
+                    JSON
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleExport("csv")}
+                    className="w-full px-3 py-1.5 text-left text-xs hover:bg-muted"
+                  >
+                    CSV
+                  </button>
+                </div>
+              )}
+            </div>
             <span className="text-xs text-muted-foreground">
               {totalElements} paquet{totalElements !== 1 ? "s" : ""}
             </span>
